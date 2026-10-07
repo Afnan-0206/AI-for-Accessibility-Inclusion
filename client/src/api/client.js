@@ -8,10 +8,21 @@ import {
 
 // Base API URL configuration
 const DEFAULT_API_URL = 'http://localhost:5000/api';
-export const API_BASE_URL = import.meta.env.VITE_API_URL || DEFAULT_API_URL;
+const rawApiUrl = (import.meta.env.VITE_API_URL || DEFAULT_API_URL).trim().replace(/\/+$/, '');
+export const API_BASE_URL = rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`;
 
-// Mock mode toggle - defaults to true for immediate out-of-the-box demo reliability
-export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
+// Mock mode toggle:
+// 1. Explicit VITE_USE_MOCK setting wins: 'true' -> mock, 'false' -> live API.
+// 2. Otherwise: if a custom VITE_API_URL is configured (e.g. Render production URL), use the live API.
+// 3. Fallback: if no custom backend URL is supplied, default to mock mode so preview demos never crash.
+export const USE_MOCK =
+  import.meta.env.VITE_USE_MOCK !== undefined
+    ? import.meta.env.VITE_USE_MOCK === 'true'
+    : Boolean(
+        !import.meta.env.VITE_API_URL ||
+        import.meta.env.VITE_API_URL.trim() === '' ||
+        import.meta.env.VITE_API_URL === DEFAULT_API_URL
+      );
 
 // Token storage key
 const TOKEN_KEY = 'samajh_auth_token';

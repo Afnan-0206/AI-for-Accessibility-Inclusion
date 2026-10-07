@@ -249,26 +249,30 @@ npm run test:ai
 
 ## 🚢 Deployment Guide
 
+For full instructions, see the dedicated [Deployment Guide (DEPLOYMENT.md)](./DEPLOYMENT.md).
+
 ### Backend on Render:
-1. Connect GitHub repository and set **Root Directory** to `server`.
+1. Connect GitHub repository via **Blueprint** (using the included [`render.yaml`](./render.yaml)) or create a **Web Service** with **Root Directory** `server`.
 2. Build Command: `npm install`
-3. Start Command: `node src/index.js`
-4. Set Environment Variables:
-   - `PORT`: `5000`
-   - `MONGODB_URI`: `<Your MongoDB Atlas connection URI>`
-   - `JWT_SECRET`: `<Secure random secret>`
-   - `GEMINI_API_KEY`: `<Your Gemini API Key>`
-   - `GEMINI_MODEL`: `gemini-3.8-flash`
-   - `CLIENT_ORIGIN`: `https://your-frontend.vercel.app`
-> *Note: Render free tier web services spin down after 15 minutes of inactivity; initial requests may take 30–50 seconds to boot.*
+3. Start Command: `npm start`
+4. Health Check Path: `/health`
+5. Set Environment Variables:
+   - `PORT`: `10000` (or leave default on Render)
+   - `SUPABASE_URL`: `<Your Supabase Project URL>`
+   - `SUPABASE_SECRET_KEY`: `<Your Supabase service_role secret key>`
+   - `JWT_SECRET`: `<Secure random secret (min 32 chars)>`
+   - `GEMINI_API_KEY`: `<Your Google Gemini API Key>`
+   - `GEMINI_MODEL`: `gemini-2.5-flash`
+   - `CLIENT_ORIGIN`: `https://your-frontend.vercel.app` (or `*`)
+> *Note: Render free tier web services spin down after 15 minutes of inactivity; initial requests may take 30–50 seconds to boot. Use `/health` for zero-downtime pinging.*
 
 ### Frontend on Vercel:
-1. Import repository and set **Root Directory** to `client`.
+1. Import repository and set **Root Directory** to `client` (or use root fallback configuration in `vercel.json`).
 2. Framework Preset: `Vite`
-3. Set Environment Variable:
+3. Set Environment Variables:
    - `VITE_API_URL`: `https://your-backend.onrender.com/api`
    - `VITE_USE_MOCK`: `false`
-4. Deploy. The included `client/vercel.json` ensures full client-side route rewrites.
+4. Deploy. The included `client/vercel.json` provides SPA rewrites and caching headers.
 
 ---
 

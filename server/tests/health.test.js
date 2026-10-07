@@ -15,6 +15,22 @@ describe('Health and System Endpoints', () => {
     assert.deepEqual(res.body, { status: 'ok' });
   });
 
+  it('GET /health should return 200 with status ok and uptime', async () => {
+    const res = await request(app).get('/health');
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.status, 'ok');
+    assert.equal(typeof res.body.uptime, 'number');
+  });
+
+  it('GET / should return 200 with service info', async () => {
+    const res = await request(app).get('/');
+
+    assert.equal(res.status, 200);
+    assert.equal(res.body.status, 'ok');
+    assert.equal(res.body.service, 'Samajh Backend API');
+  });
+
   it('GET /api/nonexistent-route should return 404 with Route not found.', async () => {
     const res = await request(app).get('/api/nonexistent-route');
 
