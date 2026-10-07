@@ -89,15 +89,18 @@ export function formatApiError(error) {
 
   if (typeof error === 'string') return error;
 
-  if (error.message && !error.message.includes('Axios') && !error.message.includes('code 500')) {
-    if (error.message === 'Network Error' || error.message.includes('ECONNREFUSED')) {
-      return "We couldn't connect to Samajh right now. Please check your internet or try again shortly.";
-    }
-  }
-
-  const serverMsg = error.response?.data?.message || error.response?.data?.error;
+  const serverMsg = error.response?.data?.error || error.response?.data?.message;
   if (serverMsg && typeof serverMsg === 'string') {
     return serverMsg;
+  }
+
+  if (
+    error.code === 'ERR_NETWORK' ||
+    error.message === 'Network Error' ||
+    error.message?.includes('Network Error') ||
+    error.message?.includes('ECONNREFUSED')
+  ) {
+    return 'Cannot connect to the Samajh backend server. Please make sure the server is running on port 5000.';
   }
 
   if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
@@ -109,11 +112,12 @@ export function formatApiError(error) {
     if (status === 400) return 'Invalid information provided. Please verify and try again.';
     if (status === 403) return 'You do not have permission to view or modify this document.';
     if (status === 404) return 'The requested document was not found.';
+    if (status === 409) return 'An account with this email already exists. Please sign in instead.';
     if (status === 413) return 'Please choose a PDF or image smaller than 10 MB.';
     if (status >= 500) return 'The Samajh server encountered an issue. Please try again in a few moments.';
   }
 
-  return 'We were unable to complete this action right now. Please try again.';
+  return error.message || 'We were unable to complete this action right now. Please try again.';
 }
 
 // -------------------------------------------------------------

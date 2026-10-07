@@ -12,10 +12,11 @@ import {
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
 
-/** Timeout duration in milliseconds for every AI call (15 seconds). */
-const TIMEOUT_MS = 15_000;
+/** Timeout duration in milliseconds for every AI call (45 seconds). */
+const TIMEOUT_MS = 45_000;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -48,14 +49,15 @@ function withTimeout(promise, ms = TIMEOUT_MS) {
  * @param {string} params.base64   - Base64-encoded document content.
  * @param {string} params.mimeType - MIME type of the document.
  * @param {string} params.language - Target output language code.
+ * @param {string} [params.model]  - Gemini model identifier.
  * @returns {Promise<import('../schemas/aiSchema.js').analysisSchema>}
  */
-async function callAnalysisModel({ base64, mimeType, language }) {
+async function callAnalysisModel({ base64, mimeType, language, model = DEFAULT_MODEL }) {
   const systemInstruction = getAnalysisSystemPrompt(language);
 
   const response = await withTimeout(
     ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model,
       contents: [
         {
           role: 'user',
@@ -77,6 +79,7 @@ async function callAnalysisModel({ base64, mimeType, language }) {
         responseMimeType: 'application/json',
       },
     }),
+    TIMEOUT_MS,
   );
 
   const rawText = response.text;
@@ -106,17 +109,20 @@ export async function analyzeDocument({ buffer, mimeType, language }) {
   const base64 = buffer.toString('base64');
 
   try {
-    // --- First attempt ---
-    return await callAnalysisModel({ base64, mimeType, language });
+    // --- First attempt with configured model ---
+    return await callAnalysisModel({ base64, mimeType, language, model: DEFAULT_MODEL });
   } catch (firstError) {
     console.warn(
-      '[aiService] First analysis attempt failed – retrying once.',
+      '[aiService] First analysis attempt failed – retrying with fallback model.',
       firstError?.message ?? firstError,
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     try {
-      // --- Single retry ---
-      return await callAnalysisModel({ base64, mimeType, language });
+      // --- Single retry with fallback model ---
+      const retryModel = (DEFAULT_MODEL === FALLBACK_MODEL) ? 'gemini-3.5-flash' : FALLBACK_MODEL;
+      return await callAnalysisModel({ base64, mimeType, language, model: retryModel });
     } catch (retryError) {
       throw new AIParsingError(
         `AI response could not be parsed or validated after retry: ${retryError?.message ?? retryError}`,
@@ -138,26 +144,39 @@ export async function analyzeDocument({ buffer, mimeType, language }) {
  */
 export async function answerQuestion({ analysis, question, language }) {
   const systemInstruction = getQASystemPrompt(language);
-
   const context = `Here is the document analysis JSON:\n${JSON.stringify(analysis, null, 2)}`;
 
-  const response = await withTimeout(
-    ai.models.generateContent({
-      model: DEFAULT_MODEL,
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            { text: context },
-            { text: `User question: ${question}` },
-          ],
+  const callQA = async (model) => {
+    const response = await withTimeout(
+      ai.models.generateContent({
+        model,
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              { text: context },
+              { text: `User question: ${question}` },
+            ],
+          },
+        ],
+        config: {
+          systemInstruction,
         },
-      ],
-      config: {
-        systemInstruction,
-      },
-    }),
-  );
+      }),
+      TIMEOUT_MS,
+    );
+    return response.text.trim();
+  };
 
-  return response.text.trim();
+  try {
+    return await callQA(DEFAULT_MODEL);
+  } catch (firstError) {
+    console.warn(
+      '[aiService] First QA attempt failed – retrying with fallback model.',
+      firstError?.message ?? firstError,
+    );
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const retryModel = (DEFAULT_MODEL === FALLBACK_MODEL) ? 'gemini-3.5-flash' : FALLBACK_MODEL;
+    return await callQA(retryModel);
+  }
 }
