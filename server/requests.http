@@ -1,0 +1,294 @@
+### Samajh Backend API Requests
+### Base URL
+@baseUrl = http://localhost:5000/api
+
+### -------------------------------------------------------------
+### 1. HEALTH CHECK
+### -------------------------------------------------------------
+
+### Health check - Expected 200 { "status": "ok" }
+GET {{baseUrl}}/health
+
+### -------------------------------------------------------------
+### 2. AUTHENTICATION (PERSON 1)
+### -------------------------------------------------------------
+
+### 2.1 Register User 1 (Deepika) - Expected 201
+# @name registerUser
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Deepika",
+  "email": "deepika@example.com",
+  "password": "password123"
+}
+
+### Save Token from Register
+@authToken = {{registerUser.response.body.token}}
+
+### 2.2 Register Duplicate Email - Expected 409 Conflict
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Deepika Duplicate",
+  "email": "deepika@example.com",
+  "password": "password123"
+}
+
+### 2.3 Register Invalid Data (Short Password) - Expected 400 Bad Request
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Deepika",
+  "email": "deepika@example.com",
+  "password": "short"
+}
+
+### 2.4 Register Invalid Data (Invalid Email) - Expected 400 Bad Request
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Deepika",
+  "email": "invalid-email",
+  "password": "password123"
+}
+
+### 2.5 Login Success - Expected 200 OK
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "deepika@example.com",
+  "password": "password123"
+}
+
+### 2.6 Login Failure (Wrong Password) - Expected 401 Unauthorized
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "deepika@example.com",
+  "password": "wrongpassword"
+}
+
+### 2.7 Login Failure (Non-existent Email) - Expected 401 Unauthorized
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "password": "password123"
+}
+
+### 2.8 Get Current User (/me) Authenticated - Expected 200 OK
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{authToken}}
+
+### 2.9 Get Current User (/me) Without Token - Expected 401 Unauthorized
+GET {{baseUrl}}/auth/me
+
+### 2.10 Get Current User (/me) Invalid Token - Expected 401 Unauthorized
+GET {{baseUrl}}/auth/me
+Authorization: Bearer invalid_jwt_token_here
+
+### -------------------------------------------------------------
+### 3. USER 2 REGISTRATION (For Cross-User Security Testing)
+### -------------------------------------------------------------
+
+### Register User 2 (Ramesh) - Expected 201
+# @name registerUser2
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Ramesh",
+  "email": "ramesh@example.com",
+  "password": "password123"
+}
+
+### User 2 Token
+@user2Token = {{registerUser2.response.body.token}}
+
+### -------------------------------------------------------------
+### 4. DOCUMENT UPLOAD & ANALYSIS
+### -------------------------------------------------------------
+
+### 4.1 Upload & Analyze Notice (Kannada) - Expected 201 Created
+# @name analyzeDoc
+POST {{baseUrl}}/documents/analyze
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="language"
+
+kn
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="property_tax_notice.pdf"
+Content-Type: application/pdf
+
+%PDF-1.4 Mock PDF Content For Testing Samajh Hackathon
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Capture Created Document ID
+@documentId = {{analyzeDoc.response.body.document.id}}
+
+### 4.2 Upload & Analyze Notice (Hindi) - Expected 201 Created
+POST {{baseUrl}}/documents/analyze
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="language"
+
+hi
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="electricity_bill.png"
+Content-Type: image/png
+
+Mock PNG bytes
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 4.3 Upload with Invalid Language - Expected 400 Bad Request
+POST {{baseUrl}}/documents/analyze
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="language"
+
+fr
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="notice.pdf"
+Content-Type: application/pdf
+
+Mock PDF Content
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 4.4 Upload with Unsupported File Type - Expected 400 Bad Request
+POST {{baseUrl}}/documents/analyze
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="language"
+
+en
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="document.exe"
+Content-Type: application/x-msdownload
+
+Binary Executable
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 4.5 Upload with Missing File - Expected 400 Bad Request
+POST {{baseUrl}}/documents/analyze
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="language"
+
+en
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### -------------------------------------------------------------
+### 5. DOCUMENT RETRIEVAL & HISTORY
+### -------------------------------------------------------------
+
+### 5.1 Get Document History for User 1 - Expected 200 OK
+GET {{baseUrl}}/documents
+Authorization: Bearer {{authToken}}
+
+### 5.2 Get Single Document by ID - Expected 200 OK
+GET {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{authToken}}
+
+### 5.3 Cross-User Access Attempt (User 2 trying to read User 1's doc) - Expected 404 Not Found
+GET {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{user2Token}}
+
+### 5.4 Get Non-existent Document - Expected 404 Not Found
+GET {{baseUrl}}/documents/00000000-0000-0000-0000-000000000099
+Authorization: Bearer {{authToken}}
+
+### -------------------------------------------------------------
+### 6. ASK QUESTIONS (AI Q&A)
+### -------------------------------------------------------------
+
+### 6.1 Ask Question in Kannada - Expected 200 OK
+POST {{baseUrl}}/documents/{{documentId}}/ask
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "question": "What happens if I miss this deadline?",
+  "language": "kn"
+}
+
+### 6.2 Ask Question in Hindi - Expected 200 OK
+POST {{baseUrl}}/documents/{{documentId}}/ask
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "question": "क्या मुझे कोई जुर्माना देना होगा?",
+  "language": "hi"
+}
+
+### 6.3 Ask Question with Invalid Language - Expected 400 Bad Request
+POST {{baseUrl}}/documents/{{documentId}}/ask
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "question": "What is the penalty?",
+  "language": "es"
+}
+
+### 6.4 Ask Question Cross-User Attempt - Expected 404 Not Found
+POST {{baseUrl}}/documents/{{documentId}}/ask
+Authorization: Bearer {{user2Token}}
+Content-Type: application/json
+
+{
+  "question": "Can I see this document?",
+  "language": "en"
+}
+
+### 6.5 Ask Question Unauthenticated - Expected 401 Unauthorized
+POST {{baseUrl}}/documents/{{documentId}}/ask
+Content-Type: application/json
+
+{
+  "question": "Can I access this?",
+  "language": "en"
+}
+
+### -------------------------------------------------------------
+### 7. DELETE DOCUMENT
+### -------------------------------------------------------------
+
+### 7.1 Cross-User Delete Attempt (User 2 trying to delete User 1's doc) - Expected 404 Not Found
+DELETE {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{user2Token}}
+
+### 7.2 Delete Document by Owner - Expected 200 OK { "success": true }
+DELETE {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{authToken}}
+
+### 7.3 Delete Again (Already deleted) - Expected 404 Not Found
+DELETE {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{authToken}}
+
+### -------------------------------------------------------------
+### 8. UNKNOWN ROUTES (404 HANDLING)
+### -------------------------------------------------------------
+
+### Unknown endpoint - Expected 404 { "error": "Route not found." }
+GET {{baseUrl}}/unknown-resource
