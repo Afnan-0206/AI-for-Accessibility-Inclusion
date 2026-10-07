@@ -2,34 +2,28 @@ const Document = require('../models/Document');
 
 // Gagan (AI Engineer) owns server/src/services/ai/**
 // We dynamically consume analyzeDocument and answerQuestion,
-// with a schema-compliant fallback when Gagan's modules are not yet loaded.
+// with a schema-compliant fallback when Gagan's modules are not yet loaded or API keys are absent.
 let aiServiceInstance = null;
 
-const loadAiService = () => {
+const loadAiService = async () => {
   if (aiServiceInstance) {
     return aiServiceInstance;
   }
 
-  const potentialAiPaths = [
-    './ai/geminiService',
-    './ai/index',
-    './ai/aiService',
-    './ai'
-  ];
-
-  for (const modulePath of potentialAiPaths) {
+  // Dynamically load Gagan's AI service (ES Module)
+  if (process.env.GEMINI_API_KEY) {
     try {
-      const mod = require(modulePath);
-      if (typeof mod.analyzeDocument === 'function') {
+      const mod = await import('./ai/aiService.js');
+      if (typeof mod.analyzeDocument === 'function' && typeof mod.answerQuestion === 'function') {
         aiServiceInstance = mod;
         return aiServiceInstance;
       }
-    } catch {
-      // Continue to next path if module is missing or incomplete
+    } catch (err) {
+      console.warn('⚠️ Could not load live AI service from ./ai/aiService.js, falling back to mock:', err.message);
     }
   }
 
-  // Contract-compliant default interface if Gagan has not yet committed AI files
+  // Contract-compliant default interface if Gagan has not yet configured keys or during isolated tests
   aiServiceInstance = {
     analyzeDocument: async ({ buffer, mimeType, language }) => {
       const langSummary = {
@@ -87,12 +81,12 @@ const setAiService = (customService) => {
 };
 
 const analyzeDocument = async ({ buffer, mimeType, language }) => {
-  const service = loadAiService();
+  const service = await loadAiService();
   return await service.analyzeDocument({ buffer, mimeType, language });
 };
 
 const answerQuestion = async ({ analysis, question, language }) => {
-  const service = loadAiService();
+  const service = await loadAiService();
   return await service.answerQuestion({ analysis, question, language });
 };
 

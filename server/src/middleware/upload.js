@@ -27,8 +27,12 @@ const upload = multer({
   }
 });
 
-const uploadSingleFile = (fieldName = 'file') => {
-  const uploader = upload.single(fieldName);
+const uploadSingleFile = () => {
+  // Support both 'file' (API spec) and 'document' (frontend form) field names
+  const uploader = upload.fields([
+    { name: 'file', maxCount: 1 },
+    { name: 'document', maxCount: 1 }
+  ]);
 
   return (req, res, next) => {
     uploader(req, res, (err) => {
@@ -41,6 +45,11 @@ const uploadSingleFile = (fieldName = 'file') => {
         }
         return res.status(400).json({ error: err.message || 'File upload failed.' });
       }
+
+      if (req.files) {
+        req.file = req.files.file?.[0] || req.files.document?.[0] || null;
+      }
+
       next();
     });
   };
