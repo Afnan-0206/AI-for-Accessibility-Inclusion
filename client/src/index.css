@@ -1,15 +1,79 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  --bg-primary: #f8fafc;
+  --text-primary: #0f172a;
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
+/* Dyslexia friendly font toggle */
+[data-dyslexic="true"] {
+  font-family: 'Atkinson Hyperlegible', 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+}
+
+/* Increased spacing toggle */
+[data-spacing="true"] body {
+  letter-spacing: 0.05em;
+  line-height: 1.85;
+  word-spacing: 0.1em;
+}
+
+/* High-Contrast Theme (WCAG AAA Yellow-on-Black) */
+[data-theme="high-contrast"] {
+  --bg-primary: #000000;
+  --text-primary: #ffff00;
+}
+
+[data-theme="high-contrast"] body {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+}
+
+[data-theme="high-contrast"] button,
+[data-theme="high-contrast"] a {
+  border: 2px solid #ffff00 !important;
+  color: #ffff00 !important;
+}
+
+[data-theme="high-contrast"] input,
+[data-theme="high-contrast"] textarea,
+[data-theme="high-contrast"] select {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+  border: 2px solid #ffff00 !important;
+}
+
+/* Dark Theme */
+[data-theme="dark"] body {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Global focus-visible indicator */
+:focus-visible {
+  outline: 3px solid #f59e0b !important;
+  outline-offset: 3px !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+[data-reduced-motion="true"] *,
+[data-reduced-motion="true"] ::before,
+[data-reduced-motion="true"] ::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

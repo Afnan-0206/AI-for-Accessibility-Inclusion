@@ -1,36 +1,42 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { A11yProvider } from './components/A11yIntegration';
-import Navbar from './components/Navbar';
+import { A11yProvider } from './a11y/A11yProvider';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardPage from './pages/DashboardPage';
-import DocumentResultPage from './pages/DocumentResultPage';
-import HistoryPage from './pages/HistoryPage';
+import Landing from './pages/Landing';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import Result from './pages/Result';
+import History from './pages/History';
+import NotFound from './pages/NotFound';
+import ConstellationDemo from './pages/ConstellationDemo';
+import ArchitecturePage from './pages/ArchitecturePage';
 
 export default function App() {
   return (
     <A11yProvider>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900">
-          <Navbar />
-          <main className="flex-1">
+        <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 high-contrast:bg-black text-slate-900 dark:text-slate-100 high-contrast:text-yellow-400 font-sans antialiased transition-colors">
+          <Header />
+          <main id="main-content" className="flex-1 outline-none" tabIndex={-1}>
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/" element={<Landing />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/architecture" element={<ArchitecturePage />} />
+              <Route path="/constellation-demo" element={<ConstellationDemo />} />
 
               {/* Protected Routes */}
               <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <DashboardPage />
+                    <Dashboard />
                   </ProtectedRoute>
                 }
               />
@@ -38,7 +44,7 @@ export default function App() {
                 path="/documents/:id"
                 element={
                   <ProtectedRoute>
-                    <DocumentResultPage />
+                    <Result />
                   </ProtectedRoute>
                 }
               />
@@ -46,15 +52,16 @@ export default function App() {
                 path="/history"
                 element={
                   <ProtectedRoute>
-                    <HistoryPage />
+                    <History />
                   </ProtectedRoute>
                 }
               />
 
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Catch-all 404 */}
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
+          <Footer />
         </div>
       </AuthProvider>
     </A11yProvider>

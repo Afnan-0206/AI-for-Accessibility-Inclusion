@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Samajh — AI for Accessibility & Inclusion Architecture",
+    "subtitle": "Complete System Architecture: Client Experience, Identity, Document Pipeline, AI Analysis & Persistence",
+    "output": "architecture-samajh.html",
+    "quality_profile": "standard"
+  },
+  "components": [
+    {
+      "id": "person",
+      "type": "external",
+      "label": "Document User",
+      "sublabel": "Citizen / Browser",
+      "pos": [40, 220],
+      "size": [130, 54]
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "App & Routes",
+      "sublabel": "App.jsx",
+      "tag": "React Router v6",
+      "pos": [230, 220],
+      "size": [140, 54]
+    },
+    {
+      "id": "accessibility",
+      "type": "frontend",
+      "label": "A11y Controls",
+      "sublabel": "A11yIntegration.jsx",
+      "tag": "WCAG AAA",
+      "pos": [230, 100],
+      "size": [140, 54]
+    },
+    {
+      "id": "authpages",
+      "type": "frontend",
+      "label": "Auth Pages",
+      "sublabel": "LoginPage / RegisterPage",
+      "pos": [230, 340],
+      "size": [140, 54]
+    },
+    {
+      "id": "authui",
+      "type": "security",
+      "label": "Auth State",
+      "sublabel": "AuthContext.jsx",
+      "tag": "JWT Token",
+      "pos": [470, 340],
+      "size": [130, 54]
+    },
+    {
+      "id": "dashboard",
+      "type": "frontend",
+      "label": "Document Dashboard",
+      "sublabel": "DashboardPage.jsx",
+      "pos": [230, 450],
+      "size": [140, 54]
+    },
+    {
+      "id": "result",
+      "type": "frontend",
+      "label": "Analysis & Q&A",
+      "sublabel": "DocumentResultPage.jsx",
+      "tag": "ChatBox",
+      "pos": [230, 560],
+      "size": [140, 54]
+    },
+    {
+      "id": "history",
+      "type": "frontend",
+      "label": "Document History",
+      "sublabel": "HistoryPage.jsx",
+      "pos": [230, 670],
+      "size": [140, 54]
+    },
+    {
+      "id": "voice",
+      "type": "frontend",
+      "label": "Voice Input",
+      "sublabel": "useVoiceInput.js",
+      "tag": "Web Speech API",
+      "pos": [40, 530],
+      "size": [130, 50]
+    },
+    {
+      "id": "readaloud",
+      "type": "frontend",
+      "label": "Read Aloud",
+      "sublabel": "ReadAloudButton.jsx",
+      "tag": "Audio Synthesis",
+      "pos": [40, 610],
+      "size": [130, 50]
+    },
+    {
+      "id": "api_client",
+      "type": "frontend",
+      "label": "API Client",
+      "sublabel": "client.js",
+      "tag": "Axios HTTP",
+      "pos": [470, 500],
+      "size": [130, 54]
+    },
+    {
+      "id": "backend",
+      "type": "backend",
+      "label": "HTTP API Server",
+      "sublabel": "index.js :5000",
+      "tag": "Express.js",
+      "pos": [700, 420],
+      "size": [140, 54]
+    },
+    {
+      "id": "authroutes",
+      "type": "security",
+      "label": "Auth Routes",
+      "sublabel": "authRoutes.js",
+      "pos": [700, 270],
+      "size": [140, 54]
+    },
+    {
+      "id": "authmiddleware",
+      "type": "security",
+      "label": "Token Auth",
+      "sublabel": "middleware/auth.js",
+      "tag": "Bearer Auth",
+      "pos": [940, 270],
+      "size": [130, 54]
+    },
+    {
+      "id": "jwt",
+      "type": "security",
+      "label": "JWT Utilities",
+      "sublabel": "utils/jwt.js",
+      "tag": "Sign & Verify",
+      "pos": [940, 160],
+      "size": [130, 54]
+    },
+    {
+      "id": "docroutes",
+      "type": "backend",
+      "label": "Document Routes",
+      "sublabel": "documentRoutes.js",
+      "pos": [700, 560],
+      "size": [140, 54]
+    },
+    {
+      "id": "upload",
+      "type": "backend",
+      "label": "File Upload",
+      "sublabel": "middleware/upload.js",
+      "tag": "Multer 10MB",
+      "pos": [700, 680],
+      "size": [140, 54]
+    },
+    {
+      "id": "docservice",
+      "type": "backend",
+      "label": "Document Ops",
+      "sublabel": "documentService.js",
+      "pos": [940, 560],
+      "size": [140, 54]
+    },
+    {
+      "id": "analysis",
+      "type": "backend",
+      "label": "AI Analysis",
+      "sublabel": "ai/aiService.js",
+      "pos": [1170, 560],
+      "size": [130, 54]
+    },
+    {
+      "id": "prompt",
+      "type": "backend",
+      "label": "AI Prompts",
+      "sublabel": "documentPrompt.js",
+      "tag": "5th-Grade Simplicity",
+      "pos": [1170, 430],
+      "size": [140, 50]
+    },
+    {
+      "id": "schema",
+      "type": "security",
+      "label": "Analysis Schema",
+      "sublabel": "aiSchema.js",
+      "tag": "Strict JSON",
+      "pos": [1170, 670],
+      "size": [140, 50]
+    },
+    {
+      "id": "aierrors",
+      "type": "backend",
+      "label": "Parse Recovery",
+      "sublabel": "aiErrors.js",
+      "tag": "Fallback Parsing",
+      "pos": [1170, 750],
+      "size": [140, 50]
+    },
+    {
+      "id": "gemini",
+      "type": "cloud",
+      "label": "Google Gemini",
+      "sublabel": "gemini-1.5-flash",
+      "tag": "Multimodal Vision",
+      "pos": [1410, 560],
+      "size": [140, 54]
+    },
+    {
+      "id": "users",
+      "type": "database",
+      "label": "User Records",
+      "sublabel": "models/User.js",
+      "pos": [1410, 270],
+      "size": [130, 50]
+    },
+    {
+      "id": "documents",
+      "type": "database",
+      "label": "Document Records",
+      "sublabel": "models/Document.js",
+      "pos": [1410, 390],
+      "size": [130, 50]
+    },
+    {
+      "id": "supabase",
+      "type": "database",
+      "label": "Supabase Database",
+      "sublabel": "config/db.js",
+      "tag": "PostgreSQL",
+      "pos": [1410, 150],
+      "size": [140, 54]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Client Experience (React 18 + Vite)",
+      "wraps": ["app", "accessibility", "authpages", "authui", "dashboard", "result", "history", "api_client"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Identity & Auth Service",
+      "wraps": ["authroutes", "authmiddleware", "jwt"]
+    },
+    {
+      "kind": "region",
+      "label": "Document Operations & AI Engine",
+      "wraps": ["docroutes", "upload", "docservice", "analysis", "prompt", "schema", "aierrors"]
+    },
+    {
+      "kind": "region",
+      "label": "Cloud AI & Persistence",
+      "wraps": ["gemini", "users", "documents", "supabase"]
+    }
+  ],
+  "connections": [
+    { "from": "person", "to": "app", "label": "uses", "variant": "emphasis" },
+    { "from": "app", "to": "accessibility", "fromSide": "top", "toSide": "bottom" },
+    { "from": "app", "to": "authpages" },
+    { "from": "app", "to": "dashboard" },
+    { "from": "app", "to": "result" },
+    { "from": "app", "to": "history" },
+    { "from": "authpages", "to": "authui" },
+    { "from": "authui", "to": "api_client" },
+    { "from": "dashboard", "to": "api_client" },
+    { "from": "history", "to": "api_client" },
+    { "from": "result", "to": "api_client" },
+    { "from": "result", "to": "voice", "fromSide": "left", "toSide": "right" },
+    { "from": "result", "to": "readaloud", "fromSide": "left", "toSide": "right" },
+    { "from": "api_client", "to": "backend", "label": "REST API", "variant": "emphasis" },
+    { "from": "backend", "to": "authroutes" },
+    { "from": "backend", "to": "docroutes" },
+    { "from": "authroutes", "to": "authmiddleware" },
+    { "from": "authroutes", "to": "jwt" },
+    { "from": "authroutes", "to": "users" },
+    { "from": "authmiddleware", "to": "jwt", "variant": "security" },
+    { "from": "docroutes", "to": "authmiddleware", "variant": "security" },
+    { "from": "docroutes", "to": "upload" },
+    { "from": "docroutes", "to": "docservice" },
+    { "from": "docservice", "to": "analysis", "label": "analyze", "variant": "emphasis" },
+    { "from": "docservice", "to": "documents" },
+    { "from": "analysis", "to": "prompt", "fromSide": "top", "toSide": "bottom" },
+    { "from": "analysis", "to": "schema", "fromSide": "bottom", "toSide": "top" },
+    { "from": "analysis", "to": "aierrors", "fromSide": "bottom", "toSide": "top" },
+    { "from": "analysis", "to": "gemini", "label": "generateContent", "variant": "emphasis" },
+    { "from": "users", "to": "supabase", "label": "SQL" },
+    { "from": "documents", "to": "supabase", "label": "SQL" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Client Experience",
+      "items": [
+        "React 18 + Tailwind CSS frontend built with Vite",
+        "Full WCAG AAA accessibility toolbar (font scaling, dyslexia mode, high contrast)",
+        "Multilingual voice input and text-to-speech audio playback (Kannada, Hindi, English)"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Identity & Security",
+      "items": [
+        "JWT-based bearer token authentication with bcrypt password hashing",
+        "Role & ownership protected document access middleware",
+        "Client auth state synchronization with persistent localStorage"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "AI Document Engine",
+      "items": [
+        "Google Gemini 1.5 Flash multimodal vision & OCR extraction",
+        "Structured JSON schema enforcement with automatic fallback parsing",
+        "Specialized 5th-grade civic simplification prompts and urgency classification"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Persistence",
+      "items": [
+        "Supabase PostgreSQL database storing document metadata and user profiles",
+        "Secure memory buffer file ingestion with zero persistent raw file retention"
+      ]
+    }
+  ]
+}
