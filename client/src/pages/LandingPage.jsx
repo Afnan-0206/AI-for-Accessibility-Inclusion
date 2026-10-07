@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import ConstellationGrid from '@/components/ui/constellation-grid';
+import ConstellationGrid from '../components/ui/constellation-grid';
 import {
   FileText,
   Calendar,
